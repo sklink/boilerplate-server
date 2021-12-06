@@ -1,0 +1,13 @@
+ - User
+ - Company
+ - Member
+ - Roles
+ - TemporaryToken (maybe)
+ - Invite
+
+ - Authorization
+ - Admin user script
+ - Email / Agenda
+ - verify that try / catch isn't needed
+
+
