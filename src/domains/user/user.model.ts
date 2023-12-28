@@ -1,5 +1,6 @@
 import { ObjectType, Field, ID } from 'type-graphql';
-import { prop as Property, getModelForClass, modelOptions as ModelOptions } from '@typegoose/typegoose';
+import { prop as Property, getModelForClass, modelOptions as ModelOptions, mongoose } from '@typegoose/typegoose';
+import { IUser, IUserSettings } from './user.interfaces';
 
 @ObjectType({ description: 'User model' })
 @ModelOptions({ schemaOptions: { timestamps: true } })
@@ -31,13 +32,22 @@ export class User {
   @Property({ default: false, required: true })
   isAdmin: boolean;
 
-  @Field()
-  @Property({ type: mongoose.Schema.Types.Mixed, default: false, required: true })
-  settings: object;
+  @Field(type => UserSettings)
+  @Property({ default: false, required: true })
+  settings: IUserSettings;
 
   @Field()
   @Property()
   deletedAt: Date;
+}
+
+@ObjectType()
+export class UserSettings {
+  @Field({ nullable: true })
+  activeCompany?: string;
+
+  @Field({ nullable: true })
+  activeProject?: string;
 }
 
 export const UserModel = getModelForClass(User);

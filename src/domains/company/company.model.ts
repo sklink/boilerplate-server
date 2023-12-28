@@ -1,6 +1,4 @@
-const mongoose = require('mongoose');
-
-const { DomainValidator } = require('./company.validators');
+import mongoose from 'mongoose';
 
 const schema = new mongoose.Schema({
   name: { type: String, required: true },

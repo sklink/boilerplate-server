@@ -6,8 +6,13 @@ export interface IUser {
   salt?: string;
   isVerified: boolean;
   isAdmin: boolean;
-  settings: object;
+  settings: IUserSettings;
   updatedAt: Date;
   createdAt: Date;
   deletedAt?: Date
+}
+
+export interface IUserSettings {
+  activeCompany?: string;
+  activeProject?: string;
 }

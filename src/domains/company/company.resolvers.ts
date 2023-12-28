@@ -1,7 +1,3 @@
-import { ObjectType, Field, ID } from 'type-graphql';
-import { prop as Property, getModelForClass } from '@typegoose/typegoose';
-import { AuthenticationError } from 'apollo-server';
-
 import { Company } from './company.model';
 import { ACL } from './company.acl';
 
@@ -42,7 +38,7 @@ const resolvers: ICompanyResolvers = {
 
   Query: {
     companies(root: ICompany, args, context) {
-      if (!context.user) throw new AuthenticationError('Authentication required.');
+      if (!context.user) throw new Error('Authentication required.');
 
       return Member.find({ userId: context.user._id })
         .populate({

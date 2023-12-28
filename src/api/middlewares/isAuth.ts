@@ -1,6 +1,7 @@
-import jwt from 'express-jwt';
+import { expressjwt as jwt } from 'express-jwt';
 
 import env from '@/_env';
+import { Algorithm } from 'jsonwebtoken';
 
 /**
  * We are assuming that the JWT will come in a header with the form
@@ -27,8 +28,8 @@ const getTokenFromHeader = req => {
 
 const isAuth = jwt({
   secret: env.JWT_SECRET, // The _secret_ to sign the JWTs
-  algorithms: [env.JWT_ALGORITHM], // JWT Algorithm
-  userProperty: 'token', // Use req.token to store the JWT
+  algorithms: [env.JWT_ALGORITHM as Algorithm], // JWT Algorithm
+  requestProperty: 'token', // Use req.token to store the JWT
   getToken: getTokenFromHeader, // How to extract the JWT from the request
 });
 

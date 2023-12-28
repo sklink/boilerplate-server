@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import argon2 from 'argon2';
 import { randomBytes } from 'crypto';
 
-import { IUser, IUserInputDTO } from '@/domains/user/user.interfaces';
+import { IUser } from '@/domains/user/user.interfaces';
 import { EventDispatcher, EventDispatcherInterface } from '@/decorators/eventDispatcher';
 import events from '@/subscribers/events';
 import MailerService from '../../services/mailer';
@@ -19,7 +19,7 @@ export default class AuthService {
   ) {
   }
 
-  public async SignUp(userInputDTO: IUserInputDTO): Promise<{ user: IUser; token: string }> {
+  public async SignUp(userInputDTO: any): Promise<{ user: IUser; token: string }> {
     try {
       const salt = randomBytes(32);
 

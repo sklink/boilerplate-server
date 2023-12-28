@@ -1,6 +1,7 @@
 import { Resolver, Mutation, Arg, Query } from 'type-graphql';
+
 import { User, UserModel } from './user.model';
-import { CategoriesInput } from './types/category-input';
+import { UserInput } from './user.inputs';
 
 @Resolver()
 export class UserResolver {

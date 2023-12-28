@@ -26,7 +26,6 @@ interface IRequiredBoilerplateEnvVars {
   readonly DATABASE_URL: string;
   readonly JWT_SECRET: string;
   readonly SESSION_SECRET: string;
-  readonly BASE_URL: string;
   readonly NODE_ENV: string;
   readonly CLIENT_BASE_URL: string;
   readonly SERVER_BASE_URL: string;
@@ -38,7 +37,6 @@ const REQUIRED_BOILERPLATE_ENV_VARS: IRequiredBoilerplateEnvVars = {
   DATABASE_URL: process.env.DATABASE_URL,
   JWT_SECRET: process.env.JWT_SECRET,
   SESSION_SECRET: process.env.SESSION_SECRET,
-  BASE_URL: process.env.BASE_URL,
   NODE_ENV: process.env.NODE_ENV,
   CLIENT_BASE_URL: process.env.CLIENT_BASE_URL,
   SERVER_BASE_URL: process.env.SERVER_BASE_URL,

@@ -1,15 +1,21 @@
 import express from 'express';
-import { ApolloServer } from 'apollo-server-express';
-import { ApolloServerPluginLandingPageGraphQLPlayground } from 'apollo-server-core';
+import http from 'http';
+import { ApolloServer } from '@apollo/server';
+import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { buildSchema } from 'type-graphql';
-import * as jwt from 'express-jwt';
+import { expressjwt as jwt } from 'express-jwt';
 
 import env from '@/_env';
 import { UserResolver } from '@/domains/user/user.resolvers';
+import { Algorithm } from 'jsonwebtoken';
+import cors from '../lib/cors';
 
 export const GRAPHQL_PATH = '/graphql';
 
 export default async ({ app }: { app: express.Application }): Promise<ApolloServer> => {
+  const httpServer = http.createServer(app);
+
   const schema = await buildSchema({
     resolvers: [
       UserResolver,
@@ -21,14 +27,19 @@ export default async ({ app }: { app: express.Application }): Promise<ApolloServ
 
   const server = new ApolloServer({
     schema,
-    context: ({ req }) => ({ req, user: req.user }),
-    plugins: [ApolloServerPluginLandingPageGraphQLPlayground],
+    plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
   });
 
   await server.start();
 
-  app.use(GRAPHQL_PATH, jwt({ secret: env.JWT_SECRET, credentialsRequired: false }));
-  server.applyMiddleware({ app, path: GRAPHQL_PATH });
+  app.use(
+    GRAPHQL_PATH,
+    cors,
+    jwt({ secret: env.JWT_SECRET, credentialsRequired: false, algorithms: [env.JWT_ALGORITHM as Algorithm] }),
+    expressMiddleware(server, {
+      context: async ({ req }) => ({ token: req.headers.token }),
+    })
+  );
 
   return server;
 };
