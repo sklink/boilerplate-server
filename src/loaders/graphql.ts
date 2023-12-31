@@ -1,15 +1,19 @@
 import express from 'express';
 import http from 'http';
+import bodyParser from 'body-parser';
+
+// Apollo
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { buildSchema } from 'type-graphql';
-import { expressjwt as jwt } from 'express-jwt';
 
-import env from '@/_env';
-import { UserResolver } from '@/domains/user/user.resolvers';
-import { Algorithm } from 'jsonwebtoken';
+// Middleware
 import cors from '../lib/cors';
+import { checkJwt } from '../api/middlewares/auth';
+
+// Resolvers
+import { UserResolver } from '@/domains/user/user.resolvers';
 
 export const GRAPHQL_PATH = '/graphql';
 
@@ -35,7 +39,8 @@ export default async ({ app }: { app: express.Application }): Promise<ApolloServ
   app.use(
     GRAPHQL_PATH,
     cors,
-    jwt({ secret: env.JWT_SECRET, credentialsRequired: false, algorithms: [env.JWT_ALGORITHM as Algorithm] }),
+    checkJwt,
+    bodyParser.json(),
     expressMiddleware(server, {
       context: async ({ req }) => ({ token: req.headers.token }),
     })

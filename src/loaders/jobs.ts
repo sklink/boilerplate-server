@@ -1,12 +1,14 @@
-import Agenda from 'agenda';
+import Agenda, { JobPriority as _JobPriority } from 'agenda';
 
 import env from '@/_env';
 import EmailSequenceJob from '@/jobs/emailSequence';
 
-export default ({ agenda }: { agenda: Agenda }) => {
+const JobPriority = { ..._JobPriority };
+
+export default async ({ agenda }: { agenda: Agenda }) => {
   agenda.define(
     'send-email',
-    { priority: 'high', concurrency: env.JOB_CONCURRENCY },
+    { priority: JobPriority.high, concurrency: env.JOB_CONCURRENCY },
     new EmailSequenceJob().handler,
   );
 

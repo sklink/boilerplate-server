@@ -8,17 +8,20 @@
 import { MAIL_PROVIDERS } from '@/services/mailer';
 
 // TODO: Review this file and configure high-level settings for your app...
-export const HAS_USERS = true;
 export const HAS_COMPANIES = true;
 export const HAS_PROJECTS = true;
 
+export const HAS_USERS = true;
 export const OPEN_REGISTRATION = HAS_USERS && true;
+export const ENABLE_AUTH0 = HAS_USERS && true;
 
 export const HAS_PHI = false;
 export const ENABLE_WEBSOCKETS = false;
+export const ENABLE_AGENDA = false;
 
 export const MAIL_PROVIDER = MAIL_PROVIDERS.ENVOKE;
 export const ENABLE_EMAIL = !HAS_PHI || MAIL_PROVIDER.PHI_COMPLIANT;
+
 
 /**
  * NOTE: You can enable remote debugging on PHI enabled application, but be sure

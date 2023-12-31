@@ -9,12 +9,13 @@ import Logger from './logger';
 
 //We have to import at least all the events once, so they can be triggered
 import './events';
+import { ENABLE_AGENDA, ENABLE_AUTH0 } from '../_configuration';
 
 export default async ({ app }: { app: express.Application }) => {
   const mongoConnection = await mongooseLoader();
   Logger.info('✌️ DB loaded and connected!');
 
-  const graphqlConnection = await graphqlLoader({ app });
+  await graphqlLoader({ app });
 
   /**
    * WTF is going on here?
@@ -37,10 +38,10 @@ export default async ({ app }: { app: express.Application }) => {
       userModel,
     ],
   });
-  Logger.info('✌️ Dependency Injector loaded');
+  Logger.info('Dependency Injector loaded');
 
-  await jobsLoader({ agenda });
-  Logger.info('✌️ Jobs loaded');
+  if (agenda && ENABLE_AGENDA) await jobsLoader({ agenda });
+  Logger.info('Agenda loaded');
 
   await expressLoader({ app });
   Logger.info('✌️ Express loaded');
