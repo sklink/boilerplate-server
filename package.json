@@ -42,6 +42,7 @@
     "mongoose": "^8.0.3",
     "morgan": "^1.10.0",
     "reflect-metadata": "^0.2.1",
+    "shortid": "^2.2.16",
     "type-graphql": "^2.0.0-beta.3",
     "typedi": "^0.10.0",
     "winston": "^3.11.0"
@@ -52,6 +53,7 @@
     "@types/jest": "^29.5.11",
     "@types/lodash": "^4.14.202",
     "@types/node": "^20.10.5",
+    "@types/shortid": "^0.0.32",
     "@typescript-eslint/eslint-plugin": "^6.16.0",
     "@typescript-eslint/parser": "^6.16.0",
     "eslint": "^8.56.0",

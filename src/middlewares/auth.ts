@@ -1,4 +1,5 @@
-import { auth } from 'express-oauth2-jwt-bearer';
+import { Request } from 'express';
+import { auth,  } from 'express-oauth2-jwt-bearer';
 
 import env from '@/_env';
 

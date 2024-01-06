@@ -1,29 +1,38 @@
-import mongoose from 'mongoose';
+import { prop as Property, getModelForClass, modelOptions as ModelOptions, Ref } from '@typegoose/typegoose';
+import { ObjectType, Field, ID } from 'type-graphql';
 
-import { IMember } from '@/domains/member/member.interfaces';
+// Models
+import { User } from '../user/user.model';
+import { Clinic } from '../clinic/clinic.model';
 
-const schema = new mongoose.Schema({
-  roles: [{ type: String }],
-  companyId: { type: mongoose.Schema.Types.ObjectId, ref: 'Company', required: true },
-  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  isAdmin: { type: Boolean, default: false, required: true },
-  deletedAt: { type: Date },
-}, { timestamps: true });
+export enum ROLE {
+  PARENT = 'PARENT',
+  CHILD = 'CHILD',
+  CLINIC_STAFF = 'CLINIC_STAFF',
+  CLINIC_ADMIN = 'CLINIC_ADMIN',
+}
 
-schema.statics.findAndUpdateOrCreate = function (options) {
-  const { companyId, userId } = options;
+@ObjectType()
+@ModelOptions({ schemaOptions: { timestamps: true } })
+export class Member {
+  @Field(() => ID)
+  _id!: string;
 
-  return this.findOne({ companyId, userId })
-    .then((member) => {
-      if (member) {
-        member.set(options);
-        return member.save();
-      }
+  @Field(type => User)
+  @Property({ ref: () => User, required: true })
+  user!: Ref<User>;
 
-      return this.create(options);
-    });
-};
+  @Field(type => Clinic)
+  @Property({ ref: () => Clinic, required: true })
+  clinic!: Ref<Clinic>;
 
-const Member = mongoose.model<IMember & mongoose.Document>('Member', schema);
+  @Field(type => [ROLE])
+  @Property({ type: () => [ROLE], required: true })
+  roles!: ROLE[];
 
-module.exports = { Member, schema };
+  @Field({ nullable: true })
+  @Property()
+  deletedAt?: Date;
+}
+
+export const MemberModel = getModelForClass(Member);

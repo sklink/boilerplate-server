@@ -10,12 +10,22 @@ import { buildSchema } from 'type-graphql';
 
 // Middleware
 import cors from '../lib/cors';
-import { checkJwt } from '../api/middlewares/auth';
+import { checkJwt } from '../middlewares/auth';
 
 // Resolvers
 import { UserResolver } from '@/domains/user/user.resolvers';
+import { User, UserModel } from '../domains/user/user.model';
+import { Member, MemberModel } from '../domains/member/member.model';
 
 export const GRAPHQL_PATH = '/graphql';
+
+export interface IContext {
+  token: string | string[];
+  authId: string | null;
+  user?: User | null;
+  member?: Member | null;
+  clinicId?: string | null;
+}
 
 export default async ({ app }: { app: express.Application }): Promise<ApolloServer> => {
   const httpServer = http.createServer(app);
@@ -42,7 +52,23 @@ export default async ({ app }: { app: express.Application }): Promise<ApolloServ
     checkJwt,
     bodyParser.json(),
     expressMiddleware(server, {
-      context: async ({ req }) => ({ token: req.headers.token }),
+      context: async ({ req }): Promise<IContext> => {
+        const result: IContext = { token: req.headers.token, authId: req.auth.payload.sub };
+
+        if (req.auth.payload.sub) {
+          result.user = await UserModel.findOne({ authId: result.authId });
+
+          if (result.user) {
+            result.clinicId = result.user.settings.activeClinicId;
+            result.member = await MemberModel.findOne({
+              clinicId: result.clinicId,
+              userId: result.user._id,
+            });
+          }
+        }
+
+        return result;
+      },
     })
   );
 

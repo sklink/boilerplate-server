@@ -8,35 +8,20 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTimeISO
 
-type Mutation {
-  createCategory(data: UserInput!): User!
-  deleteCategory(id: String!): Boolean!
-}
-
 type Query {
   loggedInUser(id: String!): User!
-  returnAllUser: [User!]!
 }
 
 """User model"""
 type User {
   _id: ID!
+  authId: String!
   deletedAt: DateTimeISO!
-  email: String!
-  isAdmin: Boolean!
-  isVerified: Boolean!
   name: String!
-  password: String!
-  salt: String!
   settings: UserSettings!
-}
-
-input UserInput {
-  description: String!
-  name: String!
 }
 
 type UserSettings {
   activeCompany: String
-  activeProject: String
+  activeJounrey: String
 }

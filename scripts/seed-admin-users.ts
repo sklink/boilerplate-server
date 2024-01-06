@@ -1,18 +1,20 @@
-import mongooseLoader from './src/loaders/mongoose';
+import mongooseLoader from '../src/loaders/mongoose';
+
+// Models
+import { UserModel } from '../src/domains/user/user.model';
+import { ClinicModel } from '../src/domains/clinic/clinic.model';
+import { MemberModel } from '../src/domains/member/member.model';
 
 import { Service, Inject } from 'typedi';
 import argon2 from 'argon2';
-import events from '../src/subscribers/events';
 import { randomBytes } from 'crypto';
-
-Logger.info('Running script seed-admin-users');
 
 @Service()
 export default class SeedAdminUsers {
   constructor(
-    @Inject('userModel') private userModel: Models.UserModel,
-    @Inject('companyModel') private companyModel: Models.UserModel,
-    @Inject('memberModel') private memberModel: Models.UserModel,
+    @Inject('userModel') private userModel: UserModel,
+    @Inject('clinicModel') private clinicModel: ClinicModel,
+    @Inject('memberModel') private memberModel: MemberModel,
     @Inject('logger') private logger,
   ) {
   }
@@ -61,25 +63,25 @@ Promise.all(promises)
   .then((users) => {
     logger.info('Users found or created.');
 
-    return Promise.all([users, Company.find({})]);
+    return Promise.all([users, Clinic.find({})]);
   })
   .then(([adminUsers, companies]) => {
     const updates = [];
 
     adminUsers.forEach((user) => {
-      companies.forEach((company) => {
+      companies.forEach((clinic) => {
         updates.push(
           Member.findAndUpdateOrCreate({
             userId: user._id,
-            companyId: company._id,
+            clinicId: clinic._id,
             roles: Object.keys(Roles),
             isAdmin: true,
           }),
         );
       });
 
-      if (!user.settings.activeCompanyId && companies.length) {
-        user.settings.activeCompanyId = companies[0]._id;
+      if (!user.settings.activeClinicId && companies.length) {
+        user.settings.activeClinicId = companies[0]._id;
         user.markModified('settings');
 
         updates.push(user.save());

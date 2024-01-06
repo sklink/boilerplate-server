@@ -28,11 +28,3 @@ export const ENABLE_EMAIL = !HAS_PHI || MAIL_PROVIDER.PHI_COMPLIANT;
  * that you are not exposing sensitive information to the public in your logs
  */
 export const ENABLE_REMOTE_DEBUGGING = !HAS_PHI && false;
-
-export const ROLES = [
-  // Add your roles here
-];
-
-// Add administrators to all companies with "ADMIN" level access
-// Configure administrator emails in process.env.ADMIN_USERS
-export const ADMIN_GLOBAL_ACCESS = false;
