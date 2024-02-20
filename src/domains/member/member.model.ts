@@ -27,7 +27,7 @@ export class Member {
   clinic!: Ref<Clinic>;
 
   @Field(type => [ROLE])
-  @Property({ type: () => [ROLE], required: true })
+  @Property({ type: [String], required: true, enum: ROLE })
   roles!: ROLE[];
 
   @Field({ nullable: true })

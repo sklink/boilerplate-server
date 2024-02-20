@@ -7,10 +7,12 @@ import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
 import { buildSchema } from 'type-graphql';
+import Container from 'typedi';
 
 // Middleware
 import cors from '../lib/cors';
-import { checkJwt } from '../middlewares/auth';
+import { checkJwt } from '../middlewares/jwt-auth.middleware';
+import { AuthChecker } from '../middlewares/graphql-auth.middleware';
 
 // Resolvers
 import { UserResolver } from '@/domains/user/user.resolvers';
@@ -24,7 +26,8 @@ export interface IContext {
   authId: string | null;
   user?: User | null;
   member?: Member | null;
-  clinicId?: string | null;
+  activeClinicId?: string | null;
+  activeJourneyId?: string | null;
 }
 
 export default async ({ app }: { app: express.Application }): Promise<ApolloServer> => {
@@ -35,13 +38,16 @@ export default async ({ app }: { app: express.Application }): Promise<ApolloServ
       UserResolver,
       // TODO: Add your resolvers here...
     ],
+    authChecker: AuthChecker,
     emitSchemaFile: true,
+    container: Container,
     validate: false,
   });
 
   const server = new ApolloServer({
     schema,
     plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    introspection: process.env.NODE_ENV === 'development'
   });
 
   await server.start();
@@ -59,9 +65,10 @@ export default async ({ app }: { app: express.Application }): Promise<ApolloServ
           result.user = await UserModel.findOne({ authId: result.authId });
 
           if (result.user) {
-            result.clinicId = result.user.settings.activeClinicId;
+            result.activeClinicId = result.user.settings.activeClinicId;
+            result.activeJourneyId = result.user.settings.activeJourneyId;
             result.member = await MemberModel.findOne({
-              clinicId: result.clinicId,
+              clinicId: result.activeClinicId,
               userId: result.user._id,
             });
           }

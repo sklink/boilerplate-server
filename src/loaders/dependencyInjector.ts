@@ -1,15 +1,26 @@
 import { Container } from 'typedi';
+
+// Utils
 import LoggerInstance from './logger';
 import agendaFactory from './agenda';
 import { ENABLE_AGENDA } from '../_configuration';
 
-export default ({ mongoConnection, models }: { mongoConnection; models: { name: string; model: any }[] }) => {
+export default ({ mongoConnection, models, services }: {
+  mongoConnection;
+  models: { name: string; model: any }[],
+  services: { name: string; service: any }[]
+}) => {
   try {
     let agendaInstance;
     let auth0Instance;
 
     models.forEach(m => {
       Container.set(m.name, m.model);
+    });
+
+    services.forEach(s => {
+      console.log('setting', s.name);
+      Container.set(s.name, s.service);
     });
 
     if (ENABLE_AGENDA) {

@@ -4,6 +4,32 @@ import { prop as Property, getModelForClass, modelOptions as ModelOptions, mongo
 // Models
 import { Lesson } from '../lesson/lesson.model';
 
+@ObjectType()
+export class UserSettings {
+  @Field({ nullable: true })
+  @Property()
+  activeClinicId?: string;
+
+  @Field({ nullable: true })
+  @Property()
+  activeJourneyId?: string;
+}
+
+@ObjectType()
+export class LessonProgress {
+  @Field(type => Lesson)
+  @Property({ ref: () => Lesson, required: true })
+  lesson!: Ref<Lesson>;
+
+  @Field(type => Int)
+  @Property({ required: true })
+  currPage!: number;
+
+  @Field()
+  @Property()
+  isCompleted!: boolean;
+}
+
 @ObjectType({ description: 'User model' })
 @ModelOptions({ schemaOptions: { timestamps: true } })
 export class User {
@@ -31,30 +57,5 @@ export class User {
   deletedAt: Date;
 }
 
-@ObjectType()
-export class UserSettings {
-  @Field({ nullable: true })
-  @Property()
-  activeClinicId?: string;
-
-  @Field({ nullable: true })
-  @Property()
-  activeJourneyId?: string;
-}
-
-@ObjectType()
-export class LessonProgress {
-  @Field(type => Lesson)
-  @Property({ ref: () => Lesson, required: true })
-  lesson!: Ref<Lesson>;
-
-  @Field(type => Int)
-  @Property({ required: true })
-  currPage!: number;
-
-  @Field()
-  @Property()
-  isCompleted!: boolean;
-}
-
 export const UserModel = getModelForClass(User);
+export default UserModel;

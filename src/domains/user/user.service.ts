@@ -1,10 +1,12 @@
 // Models
+import { Service } from 'typedi';
 import { ClinicModel } from '../clinic/clinic.model';
 import { MemberModel, ROLE } from '../member/member.model';
 
 // Types
 import { UserModel } from './user.model';
 
+@Service()
 export class UserService {
   async register(authId: string) {
     if (await UserModel.countDocuments({ authId }) > 0)
@@ -20,9 +22,13 @@ export class UserService {
     });
 
     await MemberModel.create({
-      clinicId: clinic._id,
-      userId: user._id,
+      clinic,
+      user,
       roles: [ROLE.PARENT]
     });
+
+    return UserModel.findById(user._id);
   }
 }
+
+export default new UserService();

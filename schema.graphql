@@ -8,20 +8,45 @@ A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `dat
 """
 scalar DateTimeISO
 
+type Journey {
+  _id: ID!
+  deletedAt: DateTimeISO
+  lessons: [Lesson!]!
+}
+
+type Lesson {
+  _id: ID!
+  deletedAt: DateTimeISO
+  pages: [String!]!
+  title: String!
+}
+
+type LessonProgress {
+  currPage: Int!
+  isCompleted: Boolean!
+  lesson: Lesson!
+}
+
+type Mutation {
+  registerUser: User!
+}
+
 type Query {
-  loggedInUser(id: String!): User!
+  loggedInUser: User
 }
 
 """User model"""
 type User {
   _id: ID!
+  activeJourney: Journey!
   authId: String!
-  deletedAt: DateTimeISO!
-  name: String!
+  deletedAt: DateTimeISO
+  isAdmin: Boolean!
+  progress: [LessonProgress!]!
   settings: UserSettings!
 }
 
 type UserSettings {
-  activeCompany: String
-  activeJounrey: String
+  activeClinicId: String
+  activeJourneyId: String
 }
