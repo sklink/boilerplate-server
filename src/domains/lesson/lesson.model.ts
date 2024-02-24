@@ -11,6 +11,14 @@ export class Lesson {
   @Property({ required: true })
   title!: string;
 
+  @Field()
+  @Property({ required: true })
+  subtitle!: string;
+
+  @Field()
+  @Property({ required: true })
+  description!: string;
+
   @Field(type => [String])
   @Property({ type: [String], required: true, default: [] })
   pages!: string[];

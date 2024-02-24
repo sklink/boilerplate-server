@@ -1,32 +1,39 @@
-import { Resolver, Query, Ctx,  FieldResolver, Mutation } from 'type-graphql';
-import { Inject, Service } from 'typedi';
+import { Resolver, Query, Ctx,  FieldResolver, Mutation, Arg, Int, Args } from 'type-graphql';
+import { Service } from 'typedi';
 
 // Utils
 import { IContext } from '../../loaders/graphql';
 
 // Models
-import { Journey, JourneyModel } from '../journey/journey.model';
-
-// Services
-import { Lesson } from './lesson.model';
+import { Lesson, LessonModel } from './lesson.model';
+import { CreateLessonArgs } from './lesson.arguments';
 
 @Service()
-@Resolver(of => User)
+@Resolver(of => Lesson)
 export class LessonResolver {
   @Mutation(() => Lesson, { nullable: false })
-  async createLesson(@Ctx() ctx: IContext) {
+  async createLesson(@Ctx() ctx: IContext, @Args() { title, subtitle, description }: CreateLessonArgs) {
     if (!ctx.authId) throw new Error('User is not authenticated');
 
-    if (await UserModel.countDocuments({ authId: ctx.authId }) > 0)
-      throw new Error('User is already registered');
+    const lesson = new LessonModel({ title, subtitle, description });
 
-    return this.userService.register(ctx.authId);
+    return lesson.save();
   }
 
-  @FieldResolver(of => Journey)
-  async activeJourney(@Ctx() ctx: IContext) {
-    if (!ctx.activeJourneyId) return null;
+  @Query(() => [Lesson])
+  async lessons(@Arg("archived", { defaultValue: false }) archived: boolean) {
+    const query = archived ? { deletedAt: { $ne: null } } : { deletedAt: null };
 
-    return JourneyModel.findOne({ _id: ctx.activeJourneyId });
+    return LessonModel.find(query);
+  }
+
+  @Query(() => Int)
+  async countArchivedLessons() {
+    return LessonModel.countDocuments({ deletedAt: { $ne: null } });
+  }
+
+  @Query(() => Int)
+  async countActiveLessons() {
+    return LessonModel.countDocuments({ deletedAt: null });
   }
 }

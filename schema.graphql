@@ -17,7 +17,9 @@ type Journey {
 type Lesson {
   _id: ID!
   deletedAt: DateTimeISO
+  description: String!
   pages: [String!]!
+  subtitle: String!
   title: String!
 }
 
@@ -28,10 +30,14 @@ type LessonProgress {
 }
 
 type Mutation {
+  createLesson(description: String!, subtitle: String!, title: String!): Lesson!
   registerUser: User!
 }
 
 type Query {
+  countActiveLessons: Int!
+  countArchivedLessons: Int!
+  lessons(archived: Boolean! = false): [Lesson!]!
   loggedInUser: User
 }
 

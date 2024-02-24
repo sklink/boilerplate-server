@@ -16,6 +16,7 @@ import { AuthChecker } from '../middlewares/graphql-auth.middleware';
 
 // Resolvers
 import { UserResolver } from '@/domains/user/user.resolvers';
+import { LessonResolver } from '../domains/lesson/lesson.resolvers';
 import { User, UserModel } from '../domains/user/user.model';
 import { Member, MemberModel } from '../domains/member/member.model';
 
@@ -36,6 +37,7 @@ export default async ({ app }: { app: express.Application }): Promise<ApolloServ
   const schema = await buildSchema({
     resolvers: [
       UserResolver,
+      LessonResolver,
       // TODO: Add your resolvers here...
     ],
     authChecker: AuthChecker,
