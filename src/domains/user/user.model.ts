@@ -1,33 +1,19 @@
 import { ObjectType, Field, ID, Int } from 'type-graphql';
 import { prop as Property, getModelForClass, modelOptions as ModelOptions, mongoose, Ref } from '@typegoose/typegoose';
 
-// Models
-import { Lesson } from '../lesson/lesson.model';
-
-@ObjectType()
-export class UserSettings {
-  @Field({ nullable: true })
-  @Property()
-  activeClinicId?: string;
-
-  @Field({ nullable: true })
-  @Property()
-  activeJourneyId?: string;
-}
-
 @ObjectType()
 export class LessonProgress {
-  @Field(type => Lesson)
-  @Property({ ref: () => Lesson, required: true })
-  lesson!: Ref<Lesson>;
+  @Field(type => String)
+  @Property({ required: true })
+  lessonKey!: string;
 
   @Field(type => Int)
-  @Property({ required: true })
+  @Property({ required: true, default: 0 })
   currPage!: number;
 
-  @Field()
+  @Field({ nullable: true })
   @Property()
-  isCompleted!: boolean;
+  completedOn?: Date;
 }
 
 @ObjectType({ description: 'User model' })
@@ -40,9 +26,21 @@ export class User {
   @Property({ required: true })
   authId!: string;
 
-  @Field(type => UserSettings)
-  @Property({ default: {}, required: true })
-  settings!: UserSettings;
+  @Field()
+  @Property()
+  firstName?: string;
+
+  @Field()
+  @Property()
+  lastName?: string;
+
+  @Field({ nullable: true })
+  @Property()
+  subscriptionRef?: string;
+
+  @Field({ nullable: true })
+  @Property()
+  subscriptionStatus?: string;
 
   @Field(type => [LessonProgress])
   @Property({ default: [], required: true })
@@ -50,7 +48,14 @@ export class User {
 
   @Field()
   @Property({ default: false, required: true })
+  hasDeleteRequest!: boolean;
+
+  @Field()
+  @Property({ default: false, required: true })
   isAdmin!: boolean;
+
+  @Field(() => Date)
+  createdAt!: Date;
 
   @Field({ nullable: true })
   @Property()

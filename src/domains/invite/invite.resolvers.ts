@@ -8,7 +8,9 @@ import { getExpiryDate } from "./invite.utils";
 import { Invite, InviteModel, STATUS } from "./invite.model";
 import { MemberModel, ROLE } from "../member/member.model";
 import { UserModel } from "../user/user.model";
+import { Service } from "typedi";
 
+@Service()
 @Resolver()
 export class InviteResolver {
   @Query(returns => Invite)
@@ -22,7 +24,7 @@ export class InviteResolver {
     @Ctx() ctx: IContext,
     @Arg('status', { nullable: true }) status?: string,
   ): Promise<Invite[]> {
-    const query = { clinicId: ctx.activeClinicId };
+    const query = { clinicId: process.env.DEFAULT_CLINIC };
 
     if (status) {
       query['status'] = status;
@@ -41,7 +43,6 @@ export class InviteResolver {
     const invite = new InviteModel({
       email,
       roles,
-      clinicId: ctx.activeClinicId,
       sentBy: ctx.user._id,
     });
 
@@ -56,7 +57,7 @@ export class InviteResolver {
     @Ctx() ctx: IContext,
     @Arg('_id', { nullable: false }) _id: string,
   ) {
-    const invite = await InviteModel.findOne({ _id, clinicId: ctx.activeClinicId });
+    const invite = await InviteModel.findOne({ _id });
 
     if (invite) {
       invite.sentAt = new Date();
@@ -82,12 +83,11 @@ export class InviteResolver {
 
     const result = await UserModel.updateOne(
       { authId: ctx.authId },
-      { settings: { activeClinicId: invite.clinic._id, activeJourneyId: invite.clinic.journey } },
       { upsert: true }
     );
 
     await MemberModel.create({
-      clinicId: invite.clinic._id,
+      clinicId: process.env.DEFAULT_CLINIC,
       userId: result.upsertedId,
       roles: invite.roles,
     });
@@ -99,7 +99,7 @@ export class InviteResolver {
     @Ctx() ctx: IContext,
     @Arg('_id', { nullable: false }) _id: string,
   ) {
-    const result = await InviteModel.updateOne({ _id, clinicId: ctx.activeClinicId }, { status: STATUS.REMOVED });
+    const result = await InviteModel.updateOne({ _id, clinicId: process.env.DEFAULT_CLINIC }, { status: STATUS.REMOVED });
 
     return { success: result.modifiedCount === 1, _id };
   }

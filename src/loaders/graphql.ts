@@ -17,8 +17,10 @@ import { AuthChecker } from '../middlewares/graphql-auth.middleware';
 // Resolvers
 import { UserResolver } from '@/domains/user/user.resolvers';
 import { LessonResolver } from '../domains/lesson/lesson.resolvers';
+import { JourneyResolver } from '../domains/journey/journey.resolvers';
 import { User, UserModel } from '../domains/user/user.model';
 import { Member, MemberModel } from '../domains/member/member.model';
+import { FormSubmissionResolver } from '../domains/form-submissions/form-submission.resolvers';
 
 export const GRAPHQL_PATH = '/graphql';
 
@@ -26,9 +28,8 @@ export interface IContext {
   token: string | string[];
   authId: string | null;
   user?: User | null;
+  userId?: string | null;
   member?: Member | null;
-  activeClinicId?: string | null;
-  activeJourneyId?: string | null;
 }
 
 export default async ({ app }: { app: express.Application }): Promise<ApolloServer> => {
@@ -38,7 +39,8 @@ export default async ({ app }: { app: express.Application }): Promise<ApolloServ
     resolvers: [
       UserResolver,
       LessonResolver,
-      // TODO: Add your resolvers here...
+      JourneyResolver,
+      FormSubmissionResolver,
     ],
     authChecker: AuthChecker,
     emitSchemaFile: true,
@@ -67,10 +69,8 @@ export default async ({ app }: { app: express.Application }): Promise<ApolloServ
           result.user = await UserModel.findOne({ authId: result.authId });
 
           if (result.user) {
-            result.activeClinicId = result.user.settings.activeClinicId;
-            result.activeJourneyId = result.user.settings.activeJourneyId;
+            result.userId = result.user._id;
             result.member = await MemberModel.findOne({
-              clinicId: result.activeClinicId,
               userId: result.user._id,
             });
           }

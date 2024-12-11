@@ -49,10 +49,6 @@ export class Invite {
   @Property({ ref: () => User, required: true })
   sentBy!: Ref<User>;
 
-  @Field(type => Clinic)
-  @Property({ ref: () => Clinic, required: true })
-  clinic!: Ref<Clinic>;
-
   @Field(type => ROLE)
   @Property({ type: () => [ROLE], required: true })
   roles!: ROLE[];

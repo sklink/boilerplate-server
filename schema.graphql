@@ -3,10 +3,37 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
+type ContentBlock {
+  data: String!
+  id: String!
+  type: String!
+}
+
+input ContentBlockArgs {
+  data: String!
+  id: String!
+  type: String!
+}
+
 """
 A date-time string at UTC, such as 2007-12-03T10:15:30Z, compliant with the `date-time` format outlined in section 5.6 of the RFC 3339 profile of the ISO 8601 standard for representation of dates and times using the Gregorian calendar.This scalar is serialized to a string in ISO 8601 format and parsed from a string in ISO 8601 format.
 """
 scalar DateTimeISO
+
+input EditLessonInput {
+  description: String!
+  subtitle: String!
+  title: String!
+}
+
+type FormSubmission {
+  _id: ID!
+  createdAt: DateTimeISO!
+  data: String!
+  formRef: String!
+  updatedAt: DateTimeISO!
+  user: User!
+}
 
 type Journey {
   _id: ID!
@@ -18,41 +45,65 @@ type Lesson {
   _id: ID!
   deletedAt: DateTimeISO
   description: String!
-  pages: [String!]!
+  pages: [Page]!
   subtitle: String!
   title: String!
 }
 
 type LessonProgress {
+  completedOn: DateTimeISO
   currPage: Int!
-  isCompleted: Boolean!
-  lesson: Lesson!
+  lessonKey: String!
 }
 
 type Mutation {
+  createJourney: Journey!
   createLesson(description: String!, subtitle: String!, title: String!): Lesson!
-  registerUser: User!
+  editLessonPage(blocks: [ContentBlockArgs!]!, label: String!, lessonId: ID!, pageNum: Int!): StatusResponse!
+  insertLessonPage(blocks: [ContentBlockArgs!]!, label: String!, lessonId: ID!, pageNum: Int!): StatusResponse!
+  registerUser(input: RegistrationInput!): User!
+  removeLessonPage(blocks: [ContentBlockArgs!]!, label: String!, lessonId: ID!, pageNum: Int!): StatusResponse!
+  setFormSubmission(data: String!, formRef: String!): FormSubmission!
+  updateLesson(data: EditLessonInput!, lessonId: ID!): Lesson!
+}
+
+type Page {
+  content: [ContentBlock!]!
+  label: String!
 }
 
 type Query {
+  countActiveJournies: Int!
   countActiveLessons: Int!
+  countArchivedJournies: Int!
   countArchivedLessons: Int!
+  formSubmission(formRef: String!): FormSubmission
+  journies(archived: Boolean! = false): [Journey!]!
+  lesson(lessonId: ID!): Lesson!
   lessons(archived: Boolean! = false): [Lesson!]!
   loggedInUser: User
+}
+
+input RegistrationInput {
+  firstName: String!
+  lastName: String!
+}
+
+type StatusResponse {
+  success: Boolean!
 }
 
 """User model"""
 type User {
   _id: ID!
-  activeJourney: Journey!
   authId: String!
+  createdAt: DateTimeISO!
   deletedAt: DateTimeISO
+  firstName: String!
+  hasDeleteRequest: Boolean!
   isAdmin: Boolean!
+  lastName: String!
   progress: [LessonProgress!]!
-  settings: UserSettings!
-}
-
-type UserSettings {
-  activeClinicId: String
-  activeJourneyId: String
+  subscriptionRef: String
+  subscriptionStatus: String
 }
