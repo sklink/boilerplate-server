@@ -61,10 +61,12 @@ type Mutation {
   createLesson(description: String!, subtitle: String!, title: String!): Lesson!
   editLessonPage(blocks: [ContentBlockArgs!]!, label: String!, lessonId: ID!, pageNum: Int!): StatusResponse!
   insertLessonPage(blocks: [ContentBlockArgs!]!, label: String!, lessonId: ID!, pageNum: Int!): StatusResponse!
+  markLessonComplete(lessonKey: String!): User!
   registerUser(input: RegistrationInput!): User!
   removeLessonPage(blocks: [ContentBlockArgs!]!, label: String!, lessonId: ID!, pageNum: Int!): StatusResponse!
   setFormSubmission(data: String!, formRef: String!): FormSubmission!
   updateLesson(data: EditLessonInput!, lessonId: ID!): Lesson!
+  updateLessonProgress(currPage: Int!, lessonKey: String!): User!
 }
 
 type Page {

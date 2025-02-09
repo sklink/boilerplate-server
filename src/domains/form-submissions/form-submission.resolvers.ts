@@ -25,10 +25,10 @@ export class FormSubmissionResolver {
   ) {
     if (!ctx.authId) throw new Error('User is not authenticated');
 
-    const result = await FormSubmissionModel.updateOne({ user: ctx.userId, formRef }, {
+    await FormSubmissionModel.updateOne({ user: ctx.userId, formRef }, {
       formRef, user: ctx.userId, data
     }, { upsert: true });
 
-    return { success: result.modifiedCount === 1 };
+    return FormSubmissionModel.findOne({ formRef, user: ctx.userId });
   }
 }

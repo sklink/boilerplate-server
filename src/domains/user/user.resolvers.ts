@@ -1,4 +1,4 @@
-import { Resolver, Query, Ctx, FieldResolver, Mutation, InputType, Field, Arg } from 'type-graphql';
+import { Resolver, Query, Ctx, FieldResolver, Mutation, InputType, Field, Arg, Int } from 'type-graphql';
 import { Inject, Service } from 'typedi';
 
 // Utils
@@ -6,7 +6,6 @@ import { IContext } from '../../loaders/graphql';
 
 // Models
 import { User, UserModel } from './user.model';
-import { Journey, JourneyModel } from '../journey/journey.model';
 
 // Services
 import { UserService } from './user.service';
@@ -43,5 +42,25 @@ export class UserResolver {
       throw new Error('User is already registered');
 
     return this.userService.register(ctx.authId, input);
+  }
+
+  @Mutation(() => User, { nullable: false })
+  async updateLessonProgress(@Ctx() ctx: IContext, @Arg("lessonKey") lessonKey: string, @Arg("currPage", type => Int) currPage: number) {
+    if (!ctx.authId) throw new Error('User is not authenticated');
+
+    const user = await UserModel.findOne({ authId: ctx.authId });
+    if (!user) throw new Error('User not found');
+
+    return this.userService.updateLessonProgress(user._id, { lessonKey, currPage });
+  }
+
+  @Mutation(() => User, { nullable: false })
+  async markLessonComplete(@Ctx() ctx: IContext, @Arg("lessonKey") lessonKey: string) {
+    if (!ctx.authId) throw new Error('User is not authenticated');
+
+    const user = await UserModel.findOne({ authId: ctx.authId });
+    if (!user) throw new Error('User not found');
+
+    return this.userService.markLessonComplete(user._id, lessonKey);
   }
 }

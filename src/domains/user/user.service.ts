@@ -12,6 +12,11 @@ interface IOnboardingInput {
   lastName: string;
 }
 
+interface IProgressInput {
+  lessonKey: string;
+  currPage: number;
+}
+
 @Service()
 export class UserService {
   async register(authId: string, input: IOnboardingInput) {
@@ -58,6 +63,41 @@ export class UserService {
     await ConversationModel.create(conversationOptions);
 
     return UserModel.findById(user._id);
+  }
+
+  async updateLessonProgress(userId: string, progress: IProgressInput) {
+    var user = await UserModel.findById(userId);
+    if (!user) throw new Error('User not found');
+
+    let nextProgress = user.progress.find(p => p.lessonKey === progress.lessonKey);
+
+    if (!nextProgress) {
+      nextProgress = {
+        lessonKey: progress.lessonKey,
+        currPage: progress.currPage
+      };
+      user.progress.push(nextProgress);
+    } else {
+      nextProgress.currPage = progress.currPage;
+    }
+
+    user.markModified('progress');
+
+    return await user.save();
+  }
+
+  async markLessonComplete(userId: string, lessonKey: string) {
+    var user = await UserModel.findById(userId);
+    if (!user) throw new Error('User not found');
+
+    let nextProgress = user.progress.find(p => p.lessonKey === lessonKey);
+    if (!nextProgress) throw new Error('Progress not found');
+    
+    nextProgress.completedOn = nextProgress.completedOn || new Date();
+
+    user.markModified('progress');
+
+    return await user.save();
   }
 }
 
